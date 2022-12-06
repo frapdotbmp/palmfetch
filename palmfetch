@@ -1,0 +1,35 @@
+#! /bin/bash
+
+get_de_wm() {
+	wm="${XDG_CURRENT_DESKTOP#*:}"
+	[ "$wm" ] || wm="$DESKTOP_SESSION"
+
+	# for most WMs
+	[ ! "$wm" ] && [ "$DISPLAY" ] && command -v xprop >/dev/null && {
+		id=$(xprop -root -notype _NET_SUPPORTING_WM_CHECK 2>/dev/null)
+		id=${id##* }
+		wm=$(xprop -id "$id" -notype -len 100 -f _NET_WM_NAME 8t 2>/dev/null | grep '^_NET_WM_NAME' | cut -d\" -f 2)
+	}
+
+	# for non-EWMH WMs
+	[ ! "$wm" ] || [ "$wm" = "LG3D" ] &&
+		wm=$(pgrep -m 1 -o \
+			-e "sway" \
+			-e "kiwmi" \
+			-e "wayfire" \
+			-e "sowm" \
+			-e "catwm" \
+			-e "fvwm" \
+			-e "dwm" \
+			-e "2bwm" \
+			-e "monsterwm" \
+			-e "tinywm" \
+			-e "xmonad")
+
+	echo "${wm:-unknown}"
+}
+
+echo "$(tput setaf 2)_\/_$(tput setaf 7)  kern  $(uname -r)"
+echo "$(tput setaf 2)/$(tput setaf 2)o\\$(tput setaf 7)  de/wm  $(get_de_wm)"
+echo "$(tput setaf 3) | $(tput setaf 7)  shell  $(echo ${SHELL})"
+echo "$(tput setaf 3) | $(tput setaf 7) uptime $(uptime -p | sed 's/up//')"
