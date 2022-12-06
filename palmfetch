@@ -1,5 +1,6 @@
 #! /bin/bash
 
+# from rxfetch
 get_de_wm() {
 	wm="${XDG_CURRENT_DESKTOP#*:}"
 	[ "$wm" ] || wm="$DESKTOP_SESSION"
